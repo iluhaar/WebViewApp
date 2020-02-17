@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <style>
+        .label {
+            font-size: 22.5px;
+            fill: #ffffff;
+            text-anchor: middle;
+            alignment-baseline: middle;
+        }
+
+        .face {
+            stroke: #c8c8c8;
+            stroke-width: 2;
+        }
+
+        .minorTicks {
+            stroke-width: 2;
+            stroke: white;
+        }
+
+        .majorTicks {
+            stroke: white;
+            stroke-width: 3;
+        }
+
+        .green text {
+            font-size: 12px;
+        }
+
+        .green .majorTicks {
+            stroke-width: 1;
+        }
+
+        .green .minorTicks {
+            stroke-width: .5;
+        }
+
+        .red .label {
+            fill: rgb(26,12,37);
+        }
+
+        .red .majorTicks, .red .minorTicks {
+            stroke: rgb(26,12,37);
+        }
+
+        .blue line {
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+        .gauge{
+            position:absolute;
+            width:98%; 
+            height:98%;
+        }
+    </style>
+</head>
+<body>
+        <svg class="gauge" ></svg>
+
+        <script src="scripts/d3.v3.min.js"></script>
+        <script src="scripts/viz.v1.0.0.min.js"></script>
+        <script>
+            var winWidth = document.body.clientWidth;
+            var blueX = winWidth / 6 + winWidth / 36;
+            var greenX = blueX + winWidth / 6 + winWidth / 36 + winWidth / 9;
+            var redX = greenX + winWidth / 9 + winWidth / 36 + winWidth / 6;
+
+            var svg = d3.select("svg");
+            
+            function mid(d) { return 0.5 * (d[1] + d[0]) }
+            //Blue
+            var g1 = svg.append("g").attr("class", "blue").attr("transform", "translate(" + blueX +",175)");
+            var domain1 = [0, 100];
+            var gg1 = viz.gg()
+                  .domain(domain1)
+                  .ticks(d3.range(domain1[0], domain1[1] + 1, 10))
+                  .majorTicks(function (d) { return d % 20 == 0 })
+                  .majorTickStart(.9)
+                  .majorTickEnd(.9)
+                  .minorTickStart(.9)
+                  .minorTickEnd(.9)
+                  .labelLocation(.75)
+                  .innerFaceColor("#003CEC")
+                  .faceColor("#003CEC")
+                  .needleColor("#fff")
+                  .outerRadius(winWidth/6)
+                  .innerRadius(0)
+                  .value(mid(domain1))
+                  .duration(1000);
+
+            gg1.defs(svg, 1);
+            g1.call(gg1);
+
+            // green
+            var g2 = svg.append("g").attr("class", "green").attr("transform", "translate(" + greenX + ",175)");
+            var domain2 = [-50, 30];
+            var gg2 = viz.gg()
+                  .domain(domain2)
+                  .ticks(d3.range(domain2[0], domain2[1] + 1, 4))
+                  .majorTicks(function (d) { return (d - 10) % 20 === 0 })
+                  .innerFaceColor("#4F8730")
+                  .faceColor("#4F8730")
+                  .needleColor("#F74100")
+                  .outerRadius(winWidth / 9)
+                  .innerRadius(15)
+                  .value(mid(domain2))
+                  .duration(1000)
+                  .angleOffset(Math.PI / 2)
+                  .ease("back-in");
+
+            gg2.defs(svg, 2);
+            g2.call(gg2);
+
+            //red
+            var g3 = svg.append("g").attr("class", "red").attr("transform", "translate(" + redX + ",175)");
+            var domain3 = [0, 100];
+            var gg3 = viz.gg()
+                  .domain(domain3)
+                  .innerFaceColor("#F74100")
+                  .faceColor("white")
+                  .needleColor("rgb(26,12,37)")
+                  .outerRadius(winWidth / 6)
+                  .innerRadius(20)
+                  .value(mid(domain3))
+                  .duration(1000)
+                  .angleOffset(0)
+                  .ease("bounce")
+                  .majorTicks(function (d) { return d % 10 === 0 && d != 100 });
+
+            gg3.defs(svg, 3);
+            g3.call(gg3);
+
+            setInterval(function () {
+                gg1.setNeedle(domain1[0] + Math.random() * (domain1[1] - domain1[0]));
+                gg2.setNeedle(domain2[0] + Math.random() * (domain2[1] - domain2[0]));
+                gg3.setNeedle(domain3[0] + Math.random() * (domain3[1] - domain3[0]));
+            }, 2000);
+
+            d3.select(self.frameElement).style("height", "350px");
+        </script>
+    
+</body>
+</html>
